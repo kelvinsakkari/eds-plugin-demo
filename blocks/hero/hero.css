@@ -3,7 +3,7 @@
   padding: 0;
   border-bottom-width: 60px;
   border-bottom-style: solid;
-  border-bottom-color: var(--accent-color-color);
+  border-bottom-color: var(--accent-color);
 }
 
 .hero {
