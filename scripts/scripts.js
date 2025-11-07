@@ -11,10 +11,10 @@ import {
   loadSection,
   loadSections,
   loadCSS,
-  toClassName
+  toClassName,
 } from './aem.js';
 
-import {decorateArticle} from '../templates/article/article.js';
+import decorateArticle from '../templates/article/article.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -50,7 +50,6 @@ function decorateTemplateAndTheme() {
     loadCSS(`${window.hlx.codeBasePath}/templates/article/article.css`);
   }
 }
-
 
 /**
  * load fonts.css and set a session storage flag

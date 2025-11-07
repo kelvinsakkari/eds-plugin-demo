@@ -1,4 +1,4 @@
-import { buildBlock, decorateBlock, getMetadata } from "../../scripts/aem.js";
+import { buildBlock, decorateBlock, getMetadata } from '../../scripts/aem.js';
 
 /**
  * Collects all article:tag meta values from <head>
@@ -6,20 +6,20 @@ import { buildBlock, decorateBlock, getMetadata } from "../../scripts/aem.js";
  */
 function getArticleTags() {
   const metas = document.querySelectorAll('meta[property="article:tag"]');
-  return Array.from(metas).map(meta => meta.content).filter(Boolean);
+  return Array.from(metas).map((meta) => meta.content).filter(Boolean);
 }
 
 /**
  * Decorates an article page into a two-column layout
  * @param {HTMLElement} main - the <main> element from the payload
  */
-export function decorateArticle(main) {
+function decorateArticle(main) {
   if (!main) return;
   const primary = main.querySelector('div');
   const h1 = main.querySelector('h1');
   if (!h1) return;
   main.prepend(h1);
-  
+
   const share = document.createElement('div');
   share.classList.add('section');
   share.append(buildBlock('social-share', ''));
@@ -47,22 +47,22 @@ export function decorateArticle(main) {
   // Create the <aside> element
   const aside = document.createElement('aside');
   aside.classList.add('article-aside');
-  aside.innerHTML = `<h2>Related Articles</h2>`;
+  aside.innerHTML = '<h2>Related Articles</h2>';
   const section = document.createElement('div');
   section.className = 'section';
   section.append(buildBlock('related-articles', ''));
   decorateBlock(section.querySelector('.related-articles'));
   aside.append(section);
-  
+
   main.appendChild(aside);
 
   // --- Add tags list at the bottom of the primary content ---
   const tags = getArticleTags();
   if (tags.length > 0) {
     const tagSection = document.createElement('div');
-    tagSection.classList.add('article-tags');
     const ul = document.createElement('ul');
-    tags.forEach(tag => {
+    ul.className = 'article-tags';
+    tags.forEach((tag) => {
       const li = document.createElement('li');
       li.textContent = tag;
       ul.appendChild(li);
@@ -72,3 +72,5 @@ export function decorateArticle(main) {
     primary.appendChild(tagSection);
   }
 }
+
+export default decorateArticle;

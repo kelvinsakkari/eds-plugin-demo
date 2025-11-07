@@ -8,7 +8,7 @@ function filterItems(arr, query) {
 
 function getArticleTags() {
   const metas = document.querySelectorAll('meta[property="article:tag"]');
-  return Array.from(metas).map(meta => meta.content).filter(Boolean);
+  return Array.from(metas).map((meta) => meta.content).filter(Boolean);
 }
 
 export default function decorate(block) {
@@ -23,17 +23,9 @@ export default function decorate(block) {
   // get current URL path (strip origin, keep pathname)
   const currentPath = window.location.pathname;
 
-  currentTags.forEach(tag => {
+  currentTags.forEach((tag) => {
     const matches = filterItems(allentries, tag);
-    matches.forEach(entry => {
-      // normalize tags if needed
-      let tags = [];
-      try {
-        tags = Array.isArray(entry.tags) ? entry.tags : JSON.parse(entry.tags);
-      } catch (e) {
-        tags = [];
-      }
-
+    matches.forEach((entry) => {
       // skip if it's the current page
       if (entry.path === currentPath) return;
 

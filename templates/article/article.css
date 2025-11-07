@@ -34,7 +34,7 @@ body.article {
         font-weight: bold;
     }
 
-     .article-tags ul{
+     ul.article-tags{
         display: flex;
         gap: 1rem;
         list-style: none;
