@@ -55,6 +55,7 @@ function decorateArticle(main) {
   aside.append(section);
 
   main.appendChild(aside);
+  main.classList.add('loaded');
 
   // --- Add tags list at the bottom of the primary content ---
   const tags = getArticleTags();

@@ -2,11 +2,16 @@ body.article {
     main {
         display: flex;
         flex-wrap: wrap;
-        gap: 50px;
-        padding: 80px calc((100% - 1200px) / 2);
+        padding: 20px calc((100% - 1200px) / 2);
+        visibility: hidden;
+
+        &.loaded {
+            visibility: visible;
+        }
 
         h1 {
             width: 100%;
+            margin-top: 80px;
         }
 
         >div {
@@ -20,6 +25,7 @@ body.article {
 
         >aside {
             width: calc(30% - 50px);
+            margin-left: 50px;
         }
     }
 

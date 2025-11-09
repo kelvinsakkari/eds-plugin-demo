@@ -19,6 +19,7 @@
   --link-color: #355e93;
   --link-hover-color: #355e93;
   --accent-color: #355e93;
+  --header-background-color: #000;
 
   /* fonts 
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -41,7 +42,7 @@
   --heading-font-size-xs: 22px;
 
   /* nav height */
-  --nav-height: 64px;
+  --nav-height: 124px;
 }
 
 /* fallback fonts */
@@ -90,11 +91,7 @@ body.appear {
 
 header {
   height: var(--nav-height);
-}
-
-header .header,
-footer .footer {
-  visibility: hidden;
+  background-color: var(--header-background-color);
 }
 
 header .header[data-block-status="loaded"],

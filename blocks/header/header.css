@@ -4,8 +4,6 @@ header .nav-wrapper {
   color: white;
   width: 100%;
   z-index: 2;
-  position: fixed;
-  padding-top: 60px;
 }
 
 header nav {
@@ -273,4 +271,25 @@ header nav .nav-tools {
 
 header nav .default-content-wrapper {
     float: right;
+}
+
+nav.breadcrumbs {
+    font-size: var(--body-font-size-s);
+    width: 100%;
+    position: absolute;
+
+    ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+
+        li {
+            &:not(:last-child)::after {
+                content: '/';
+                margin-left: 8px;
+            }
+        }
+    }
 }
