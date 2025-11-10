@@ -1,11 +1,9 @@
-const API_BASE = 'https://api.dvidshub.net/search';
+const API_BASE_SEARCH = 'https://api.dvidshub.net/search';
+const API_BASE_ASSET = 'https://api.dvidshub.net/asset';
 const API_KEY = 'key-6911edd214ab0'; // keep secret; consider a proxy for production.
-const MAX_RESULTS = 50; // DVIDS max per page.
+const MAX_RESULTS = 20;
 
-// State
 let page = 1;
-let lastQuery = '';
-let lastParams = {};
 
 const els = {
   q: document.getElementById('q'),
@@ -24,8 +22,8 @@ function setStatus(text) {
   els.status.textContent = text;
 }
 
-function buildUrl(params) {
-  const u = new URL(API_BASE);
+function buildSearchUrl(params) {
+  const u = new URL(API_BASE_SEARCH);
   const p = new URLSearchParams();
   p.set('api_key', API_KEY);
   p.set('type[]', 'image');
@@ -36,9 +34,8 @@ function buildUrl(params) {
   p.set('sortdir', params.sortdir || 'desc');
   p.set('page', params.page || 1);
   p.set('max_results', String(MAX_RESULTS));
-  // request higher-res thumbnails for the grid (fast + decent quality):
-  p.set('thumb_width', '512');
-  p.set('thumb_quality', '90');
+  p.set('thumb_width', '256');
+  p.set('thumb_quality', '80');
   u.search = p.toString();
   return u.toString();
 }
@@ -53,20 +50,17 @@ async function search(pageOverride) {
     sortdir: els.sortdir.value,
     page,
   };
-  lastParams = params;
-  lastQuery = JSON.stringify(params);
 
   setStatus('Searching…');
   try {
-    const url = buildUrl(params);
+    const url = buildSearchUrl(params);
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Search failed: ${res.status}`);
     const data = await res.json();
 
     const results = Array.isArray(data.results) ? data.results : [];
     renderGrid(results);
-    const info = data.page_info || {};
-    setStatus(`Page ${page} — ${results.length} results (per page: ${info.results_per_page || MAX_RESULTS})`);
+    setStatus(`Page ${page} — ${results.length} results`);
   } catch (e) {
     console.error(e);
     setStatus(`Error: ${e.message}`);
@@ -76,11 +70,10 @@ async function search(pageOverride) {
 function renderGrid(items) {
   els.grid.innerHTML = '';
   items.forEach((item) => {
-    // DVIDS fields: id (e.g., "image:9380327"), title, width, height, thumbnail, url, credit, etc.
     const card = document.createElement('div');
     card.className = 'card';
     const img = document.createElement('img');
-    img.src = item.thumbnail; // 512px thumb requested via params
+    img.src = item.thumbnail;
     img.alt = item.title || '';
     const meta = document.createElement('div');
     meta.className = 'meta';
@@ -91,93 +84,44 @@ function renderGrid(items) {
   });
 }
 
-/**
- * Strategy to get "full-size" image:
- * 1) Try to obtain a large derivative via thumb_width near original width.
- * 2) If you require the true original, fetch item.url page and resolve its download image href.
- */
 async function onSelect(item) {
   setStatus('Fetching full asset…');
   try {
     // Step 1: Query Asset API with the image ID
-    const assetUrl = `https://api.dvidshub.net/asset?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
+    const assetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(item.id)}&api_key=${API_KEY}`;
     const res = await fetch(assetUrl, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`Asset API failed: ${res.status}`);
     const data = await res.json();
 
-    // Step 2: Extract full image URL from asset response
     const fullImageUrl = data.results?.image;
-    if (!fullImageUrl) throw new Error('No full image URL found in asset response');
+    if (!fullImageUrl) throw new Error('No full image URL found');
 
-    // Step 3: Fetch the binary image
-    const imgRes = await fetch(fullImageUrl);
-    if (!imgRes.ok) throw new Error(`Image fetch failed: ${imgRes.status}`);
-    const blob = await imgRes.blob();
+    // Step 2: Load image into <img>
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // allow canvas use
+    img.src = fullImageUrl;
+    await img.decode();
 
-    // Step 4: Copy binary image to clipboard
+    // Step 3: Draw into canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    // Step 4: Convert to blob
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+    // Step 5: Copy blob to clipboard
     await navigator.clipboard.write([
       new ClipboardItem({ [blob.type]: blob })
     ]);
 
-    setStatus('✅ Full image copied to clipboard');
+    setStatus('✅ Image copied to clipboard');
   } catch (err) {
     console.error(err);
     setStatus(`❌ Copy failed: ${err.message}`);
   }
-}
-
-
-async function resolveLargeThumbnail(item) {
-  // Use the Search API again, requesting a "near-original" thumb by width.
-  // If the original width is known, request that; otherwise fallback to 2000 (API max).
-  const targetWidth = Math.min(item.width || 2000, 2000);
-  const u = new URL(API_BASE);
-  const p = new URLSearchParams();
-  p.set('api_key', API_KEY);
-  p.set('type[]', 'image');
-  p.set('id', item.id); // narrow to specific asset
-  p.set('thumb_width', String(targetWidth));
-  p.set('thumb_quality', '95');
-  u.search = p.toString();
-
-  const res = await fetch(u.toString(), { headers: { Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`Failed to resolve large thumbnail: ${res.status}`);
-  const data = await res.json();
-  const result = Array.isArray(data.results) ? data.results[0] : null;
-  if (!result || !result.thumbnail) throw new Error('No thumbnail in response.');
-  return result.thumbnail;
-}
-
-async function resolveOriginalFromPage(assetUrl) {
-  // Fetch the DVIDS asset page and attempt to find a direct image/download URL.
-  const res = await fetch(assetUrl, { headers: { Accept: 'text/html' } });
-  if (!res.ok) throw new Error(`Failed to load asset page: ${res.status}`);
-
-  const html = await res.text();
-  // Heuristics: look for og:image or a download link.
-  const ogMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
-  if (ogMatch) return ogMatch[1];
-
-  const dlMatch = html.match(/href=["'](https?:\/\/[^"']+\/download\/[^"']+)["']/i);
-  if (dlMatch) return dlMatch[1];
-
-  // Fallback: sometimes original image URLs are present as direct <img> sources.
-  const imgMatch = html.match(/<img[^>]+src=["'](https?:\/\/[^"']+\/photos\/[^"']+)["']/i);
-  if (imgMatch) return imgMatch[1];
-
-  throw new Error('Original image URL not found on page.');
-}
-
-async function fetchImageBlob(url) {
-  const res = await fetch(url, { mode: 'cors' });
-  if (!res.ok) throw new Error(`Image fetch failed: ${res.status}`);
-  return res.blob();
-}
-
-async function copyImageToClipboard(blob) {
-  // Clipboard API requires secure context (https) and user gesture (click).
-  const item = new ClipboardItem({ [blob.type || 'image/jpeg']: blob });
-  await navigator.clipboard.write([item]);
 }
 
 // Wire UI
@@ -186,5 +130,5 @@ els.next.addEventListener('click', () => search(page + 1));
 els.prev.addEventListener('click', () => search(Math.max(1, page - 1)));
 els.q.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(1); });
 
-// Initial load focus
+// Initial focus
 setTimeout(() => els.q.focus(), 50);
