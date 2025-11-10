@@ -1,5 +1,5 @@
 const API_BASE = 'https://api.dvidshub.net/search';
-const API_KEY = '5f261bc62d998df3de20f8c38f0a2353774c2df5'; // keep secret; consider a proxy for production.
+const API_KEY = 'key-6911edd214ab0'; // keep secret; consider a proxy for production.
 const MAX_RESULTS = 50; // DVIDS max per page.
 
 // State
