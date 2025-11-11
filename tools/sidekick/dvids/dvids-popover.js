@@ -82,12 +82,21 @@ function renderGrid(items) {
     meta.className = 'meta';
     meta.textContent = item.title || '';
     card.append(img, meta);
-    card.addEventListener('click', () => onSelect(item));
+    card.addEventListener('click', () => onSelect(item, card));
     els.grid.appendChild(card);
   });
 }
 
-function onSelect(item) {
+function showCopiedOverlay(card) {
+  const overlay = document.createElement('div');
+  overlay.className = 'copied-overlay';
+  overlay.textContent = '✅ Image copied';
+  card.appendChild(overlay);
+
+  setTimeout(() => overlay.remove(), 1500);
+}
+
+function onSelect(item, card) {
   console.log('[CLICK]', item.id, 'document.hasFocus=', document.hasFocus());
   window.focus();
   console.log('[AFTER window.focus] document.hasFocus=', document.hasFocus());
@@ -117,13 +126,13 @@ function onSelect(item) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
 
-      // Use toBlob callback to stay inside gesture context
       canvas.toBlob(async (blob) => {
         console.log('[BLOB CREATED]', blob, 'document.hasFocus=', document.hasFocus());
         try {
           await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
           console.log('[CLIPBOARD WRITE SUCCESS]');
           setStatus('✅ Image copied to clipboard');
+          showCopiedOverlay(card);
         } catch (err) {
           console.error('[CLIPBOARD WRITE ERROR]', err);
           setStatus(`❌ Copy failed: ${err.message}`);
