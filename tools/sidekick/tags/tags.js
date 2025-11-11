@@ -15,7 +15,7 @@ async function loadTags() {
 
       const input = document.createElement('input');
       input.type = 'checkbox';
-      input.value = title; // copy the title itself
+      input.value = title;
 
       label.appendChild(input);
       label.appendChild(document.createTextNode(' ' + title));
@@ -29,13 +29,24 @@ async function loadTags() {
 
 document.getElementById('copy-btn').addEventListener('click', () => {
   const selected = [...document.querySelectorAll('#tag-list input[type=checkbox]:checked')]
-    .map(cb => cb.value) // copy the titles
+    .map(cb => cb.value)
     .join(',');
+
   if (selected) {
     navigator.clipboard.writeText(selected);
-    alert('Copied: ' + selected);
-  } else {
-    alert('No tags selected.');
+
+    // Reset all checkboxes
+    document.querySelectorAll('#tag-list input[type=checkbox]').forEach(cb => cb.checked = false);
+
+    // Close the palette (remove it from DOM)
+    const palette = document.body.closest('html'); 
+    // If running inside Sidekick palette, you can call sidekick.closePalette()
+    if (window.sidekick && typeof window.sidekick.closePalette === 'function') {
+      window.sidekick.closePalette();
+    } else {
+      // Fallback: hide the palette container if standalone
+      document.body.innerHTML = '<p>Tags copied to clipboard. Palette closed.</p>';
+    }
   }
 });
 
