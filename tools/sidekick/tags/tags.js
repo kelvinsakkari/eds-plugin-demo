@@ -39,12 +39,10 @@ document.getElementById('copy-btn').addEventListener('click', () => {
         document.querySelectorAll('#tag-list input[type=checkbox]').forEach(cb => cb.checked = false);
 
         // Close the palette properly
-        if (window.sidekick && typeof window.sidekick.closePalette === 'function') {
-            chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
+        chrome.runtime.sendMessage('igkmdomcgoebiipaifhmpfjhbjccggml', {
                 id: 'tags',
                 action: 'closePalette',
             });
-        }
     }
 });
 
