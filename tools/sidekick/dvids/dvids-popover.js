@@ -114,6 +114,13 @@ function onSelect(item, card) {
       const fullImageUrl = data.results?.image;
       if (!fullImageUrl) throw new Error('No full image URL found');
 
+      // Store asset data for paste detection
+      sessionStorage.setItem('dvids_last_copied', JSON.stringify({
+        id: item.id,
+        assetData: data.results,
+        timestamp: Date.now()
+      }));
+
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = fullImageUrl;
@@ -190,6 +197,99 @@ els.search.addEventListener('click', () => search(1));
 els.next.addEventListener('click', () => search(page + 1));
 els.prev.addEventListener('click', () => search(Math.max(1, page - 1)));
 els.q.addEventListener('keydown', (e) => { if (e.key === 'Enter') search(1); });
+
+// Detect paste events with images and show alt text dialog
+document.addEventListener('paste', async (e) => {
+  const items = e.clipboardData?.items || [];
+  const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
+  
+  if (imageItem) {
+    console.log('[PASTED IMAGE]', imageItem.type);
+    
+    // Check if we have a recently copied DVIDS asset
+    const lastCopied = sessionStorage.getItem('dvids_last_copied');
+    if (lastCopied) {
+      try {
+        const { id, assetData, timestamp } = JSON.parse(lastCopied);
+        // Only show dialog if copied within last 10 minutes
+        if (Date.now() - timestamp < 10 * 60 * 1000) {
+          await showAltTextDialog(id, assetData);
+        }
+      } catch (err) {
+        console.error('[PASTE ERROR]', err);
+      }
+    }
+  }
+});
+
+async function showAltTextDialog(assetId, assetData) {
+  // Extract alt text from asset data (check multiple possible fields)
+  const altText = assetData?.description || 
+                  assetData?.caption || 
+                  assetData?.title || 
+                  assetData?.alt_text ||
+                  'No description available';
+  
+  console.log('[ALT TEXT]', altText);
+  
+  // Create dialog overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'alt-text-dialog-overlay';
+  overlay.innerHTML = `
+    <div class="alt-text-dialog">
+      <div class="alt-text-dialog-header">
+        <h3>DVIDS Image Alt Text</h3>
+        <button class="alt-text-dialog-close" aria-label="Close">×</button>
+      </div>
+      <div class="alt-text-dialog-body">
+        <p class="alt-text-label">Alt text / Description:</p>
+        <textarea class="alt-text-content" readonly>${altText}</textarea>
+        ${assetData?.id ? `<p class="alt-text-meta">Asset ID: ${assetData.id}</p>` : ''}
+      </div>
+      <div class="alt-text-dialog-footer">
+        <button class="alt-text-copy-btn">Copy Alt Text</button>
+        <button class="alt-text-close-btn">Close</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Close handlers
+  const closeDialog = () => overlay.remove();
+  overlay.querySelector('.alt-text-dialog-close').addEventListener('click', closeDialog);
+  overlay.querySelector('.alt-text-close-btn').addEventListener('click', closeDialog);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeDialog();
+  });
+  
+  // Copy button handler
+  overlay.querySelector('.alt-text-copy-btn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(altText);
+      const copyBtn = overlay.querySelector('.alt-text-copy-btn');
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '✅ Copied!';
+      copyBtn.disabled = true;
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.disabled = false;
+      }, 2000);
+    } catch (err) {
+      console.error('[COPY ALT TEXT ERROR]', err);
+      setStatus(`❌ Failed to copy alt text: ${err.message}`);
+    }
+  });
+  
+  // Escape key to close
+  const escapeHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeDialog();
+      document.removeEventListener('keydown', escapeHandler);
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
 
 // Initial focus
 setTimeout(() => {

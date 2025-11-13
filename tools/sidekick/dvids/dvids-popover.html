@@ -31,6 +31,147 @@
   pointer-events: none;
   border-radius: 6px;
 }
+    /* Alt Text Dialog Styles */
+    .alt-text-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+    @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+    .alt-text-dialog {
+  background: var(--sk-bg, rgba(32,32,32,0.98));
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #555;
+  animation: slideUp 0.2s ease-out;
+}
+    @keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+    .alt-text-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #444;
+}
+    .alt-text-dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+    .alt-text-dialog-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+    .alt-text-dialog-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+    .alt-text-dialog-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+    .alt-text-label {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ddd;
+}
+    .alt-text-content {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+    .alt-text-content:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+  border-color: #0066cc;
+}
+    .alt-text-meta {
+  margin: 0;
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+    .alt-text-dialog-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid #444;
+}
+    .alt-text-dialog-footer button {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: #2a2a2a;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+    .alt-text-dialog-footer button:hover {
+  background: #3a3a3a;
+  border-color: #666;
+}
+    .alt-text-copy-btn {
+  background: #0066cc !important;
+  border-color: #0066cc !important;
+}
+    .alt-text-copy-btn:hover {
+  background: #0052a3 !important;
+  border-color: #0052a3 !important;
+}
+    .alt-text-copy-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #004d99 !important;
+}
   </style>
 </head>
 <body>
