@@ -31,6 +31,120 @@
   pointer-events: none;
   border-radius: 6px;
 }
+    .alt-text-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+    .alt-text-dialog {
+  background: var(--sk-bg, rgba(32,32,32,0.95));
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+    .alt-text-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #444;
+}
+    .alt-text-dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+    .alt-text-dialog-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+    .alt-text-dialog-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+    .alt-text-dialog-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+    .alt-text-label {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+    .alt-text-content {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #666;
+  border-radius: 6px;
+  background: #111;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+    .alt-text-content:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+    .alt-text-dialog-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid #444;
+}
+    .alt-text-dialog-footer button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #666;
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+    .alt-text-dialog-footer button:hover {
+  background: #333;
+}
+    .alt-text-copy-btn {
+  background: #0066cc !important;
+  border-color: #0066cc !important;
+}
+    .alt-text-copy-btn:hover {
+  background: #0052a3 !important;
+}
+    .alt-text-copy-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
   </style>
 </head>
 <body>
