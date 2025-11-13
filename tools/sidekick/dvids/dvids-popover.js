@@ -120,24 +120,50 @@ function onSelect(item, card) {
       await img.decode();
       console.log('[IMAGE LOADED]', fullImageUrl, img.naturalWidth, img.naturalHeight);
 
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+      // Resize if image is too large (max 4096px on longest side to stay under clipboard limits)
+      const MAX_DIMENSION = 4096;
+      let targetWidth = img.naturalWidth;
+      let targetHeight = img.naturalHeight;
+      
+      if (targetWidth > MAX_DIMENSION || targetHeight > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / targetWidth, MAX_DIMENSION / targetHeight);
+        targetWidth = Math.floor(targetWidth * ratio);
+        targetHeight = Math.floor(targetHeight * ratio);
+        console.log('[RESIZE]', `${img.naturalWidth}x${img.naturalHeight} → ${targetWidth}x${targetHeight}`);
+        setStatus(`Resizing image to ${targetWidth}x${targetHeight}...`);
+      }
 
-      canvas.toBlob(async (blob) => {
-        console.log('[BLOB CREATED]', blob, 'document.hasFocus=', document.hasFocus());
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-          console.log('[CLIPBOARD WRITE SUCCESS]');
-          setStatus('✅ Image copied to clipboard');
-          showCopiedOverlay(card);
-        } catch (err) {
-          console.error('[CLIPBOARD WRITE ERROR]', err);
-          setStatus(`❌ Copy failed: ${err.message}`);
-        }
-      }, 'image/png');
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+      // Try PNG first, fall back to JPEG if too large
+      let blobType = 'image/png';
+      let blob = await new Promise(resolve => canvas.toBlob(resolve, blobType));
+      
+      console.log('[BLOB CREATED]', `${(blob.size / 1024 / 1024).toFixed(2)} MB`, blob.type);
+      
+      // If PNG is too large (> 3 MB), try JPEG with high quality
+      const MAX_BLOB_SIZE = 3 * 1024 * 1024; // 3 MB
+      if (blob.size > MAX_BLOB_SIZE) {
+        console.log('[BLOB TOO LARGE] Converting to JPEG...');
+        setStatus('Image too large, compressing...');
+        blobType = 'image/jpeg';
+        blob = await new Promise(resolve => canvas.toBlob(resolve, blobType, 0.92));
+        console.log('[JPEG BLOB]', `${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+      }
+
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ [blobType]: blob })]);
+        console.log('[CLIPBOARD WRITE SUCCESS]', `${(blob.size / 1024 / 1024).toFixed(2)} MB written`);
+        setStatus(`✅ Image copied (${targetWidth}x${targetHeight}, ${(blob.size / 1024 / 1024).toFixed(2)} MB)`);
+        showCopiedOverlay(card);
+      } catch (err) {
+        console.error('[CLIPBOARD WRITE ERROR]', err);
+        setStatus(`❌ Copy failed: ${err.message}`);
+      }
     } catch (err) {
       console.error('[COPY ERROR]', err);
       setStatus(`❌ Copy failed: ${err.message}`);
