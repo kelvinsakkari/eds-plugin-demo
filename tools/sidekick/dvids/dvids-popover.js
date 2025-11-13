@@ -239,13 +239,14 @@ function showAltTextDialog(assetId, assetData) {
     try {
       await navigator.clipboard.writeText(altText);
       const copyBtn = overlay.querySelector('.alt-text-copy-btn');
-      const originalText = copyBtn.textContent;
       copyBtn.textContent = '✅ Copied!';
       copyBtn.disabled = true;
+      console.log('[ALT TEXT COPIED]', altText.substring(0, 100));
+      setStatus('✅ Alt text copied to clipboard');
+      // Close the entire DVIDS popover after a brief moment
       setTimeout(() => {
-        copyBtn.textContent = originalText;
-        copyBtn.disabled = false;
-      }, 2000);
+        window.close();
+      }, 500);
     } catch (err) {
       console.error('[COPY ALT TEXT ERROR]', err);
       setStatus(`❌ Failed to copy alt text: ${err.message}`);
