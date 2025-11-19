@@ -12,6 +12,8 @@ import {
   loadSections,
   loadCSS,
   toClassName,
+  decorateBlock,
+  loadBlock,
 } from './aem.js';
 
 import decorateArticle from '../templates/article/article.js';
@@ -133,6 +135,17 @@ async function loadEager(doc) {
 }
 
 /**
+ * Loads the banner block into the header
+ * @param {Element} header The header element
+ */
+async function loadBanner(header) {
+  const bannerBlock = buildBlock('banner', '');
+  header.prepend(bannerBlock);
+  decorateBlock(bannerBlock);
+  return loadBlock(bannerBlock);
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
@@ -144,7 +157,9 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
+  const header = doc.querySelector('header');
+  await loadBanner(header);
+  loadHeader(header);
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);

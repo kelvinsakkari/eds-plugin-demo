@@ -1,0 +1,234 @@
+/* stylelint-disable selector-class-pattern */
+
+/* USWDS Banner Styles - uses BEM notation per USWDS standards */
+.banner {
+  background-color: #000;
+  font-family: var(--body-font-family);
+}
+
+.banner-container {
+  max-width: 100%;
+  padding: 0;
+}
+
+.banner-wrapper {
+  max-width: 100%;
+  padding: 0;
+}
+
+.usa-accordion {
+  font-family: var(--body-font-family);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.usa-banner__header {
+  position: relative;
+  background-color: #000;
+  padding: 0;
+  height: auto;
+  min-height: auto;
+}
+
+.banner header {
+  height: auto;
+  min-height: auto;
+}
+
+.usa-banner__inner {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  gap: 0.5rem;
+}
+
+.grid-col-auto {
+  flex: 0 0 auto;
+}
+
+.grid-col-fill {
+  flex: 1 1 0;
+}
+
+.usa-banner__header-flag {
+  width: 1rem;
+  height: auto;
+}
+
+.usa-banner__header-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: #fff;
+  display: inline;
+}
+
+.usa-banner__header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  margin-left: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.usa-banner__header-action-icon {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@media (width >= 640px) {
+  .usa-banner__header-action {
+    display: inline;
+  }
+  
+  .tablet\:grid-col-auto {
+    flex: 0 0 auto;
+  }
+}
+
+.usa-accordion__button {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: normal;
+  line-height: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.usa-banner__button {
+  position: static;
+  width: auto;
+  padding: 0;
+  background-image: none;
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+@media (width >= 640px) {
+  .usa-banner__button {
+    position: static;
+    width: auto;
+    padding: 0;
+    background-image: none;
+  }
+  
+  .usa-banner__button-text {
+    display: inline;
+  }
+}
+
+.usa-banner__button:hover {
+  color: #ccc;
+}
+
+.usa-banner__button-text {
+  font-size: 0.8125rem;
+  display: inline;
+}
+
+.usa-banner__content {
+  background-color: #000;
+  overflow: hidden;
+  padding: 0;
+}
+
+.usa-banner__content[hidden] {
+  display: none;
+}
+
+.usa-accordion__content {
+  background-color: #000;
+  margin-top: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.grid-row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.usa-banner__content .grid-row {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.grid-gap-lg {
+  gap: 2rem;
+}
+
+.tablet\:grid-col-6 {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.usa-banner__guidance {
+  display: flex;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  flex: 1 1 0;
+}
+
+.usa-banner__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.usa-media-block__img {
+  margin-right: 0.5rem;
+}
+
+.usa-media-block__body {
+  flex: 1;
+}
+
+.usa-media-block__body p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.usa-media-block__body strong {
+  font-weight: 700;
+}
+
+.icon-lock {
+  display: inline;
+  vertical-align: middle;
+}
+
+.icon-lock svg {
+  width: 0.875rem;
+  height: auto;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.usa-banner__lock-image {
+  width: 0.8125em;
+  height: 1em;
+}
+
