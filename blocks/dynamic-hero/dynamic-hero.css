@@ -1,0 +1,88 @@
+.dynamic-hero-container .dynamic-hero-wrapper {
+  max-width: unset;
+  padding: 0;
+  border-bottom: 60px solid var(--accent-color);
+}
+
+.dynamic-hero {
+  position: relative;
+  padding: 240px 24px;
+  min-height: 300px;
+}
+
+.dynamic-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, #000, hsl(0deg 0% 100% / 0%) 50%);
+  z-index: 0;
+}
+
+.dynamic-hero-content {
+  width: 40%;
+  position: relative;
+  z-index: 1;
+  margin-left: calc((100% - 1200px) / 2);
+}
+
+
+.dynamic-hero h1 {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--background-color);
+  font-size: 60px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 2px 2px 8px rgb(0 0 0 / 80%), 0 0 20px rgb(0 0 0 / 50%);
+}
+
+.dynamic-hero picture {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+
+.dynamic-hero img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.dynamic-hero p {
+  color: var(--background-color);
+  font-size: 18px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.dynamic-hero .button-container {
+  margin-top: 24px;
+}
+
+.dynamic-hero .button {
+  display: inline-block;
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.dynamic-hero .button.primary {
+  background-color: #fff;
+  color: #000;
+}
+
+.dynamic-hero .button.primary:hover {
+  background-color: #f0f0f0;
+}
+
+@media (width >= 900px) {
+  .dynamic-hero {
+    padding: 240px 32px;
+  }
+}
+

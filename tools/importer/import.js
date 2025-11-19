@@ -101,19 +101,9 @@ export default {
     extractCfBody(main, document);
     // attempt to remove non-content elements
     WebImporter.DOMUtils.remove(main, [
-      'header',
-      '.header',
-      'nav',
-      '.nav',
-      'footer',
-      '.footer',
-      'iframe',
-      'noscript',
-      '.social-share',
-      '.contentfragment h3',
-      '.cf-dateline',
-      'dl',
-      'aside',
+     
+      
+      
     ]);
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
