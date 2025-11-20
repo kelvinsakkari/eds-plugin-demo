@@ -2,23 +2,23 @@ import { fetchNewsArticles, buildArticleImage, getDisplayedArticlePaths } from '
 
 function createArticleCard(article) {
   const li = document.createElement('li');
-  
+
   const imageDiv = document.createElement('div');
   imageDiv.classList.add('cards-card-image');
   imageDiv.innerHTML = buildArticleImage(article.image, article.title);
-  
+
   const bodyDiv = document.createElement('div');
   bodyDiv.classList.add('cards-card-body');
-  
+
   const title = document.createElement('h3');
   title.textContent = article.title;
-  
+
   const description = document.createElement('p');
   description.textContent = article.description;
-  
+
   bodyDiv.appendChild(title);
   bodyDiv.appendChild(description);
-  
+
   if (article.path) {
     const link = document.createElement('p');
     link.classList.add('button-container');
@@ -29,10 +29,10 @@ function createArticleCard(article) {
     link.appendChild(anchor);
     bodyDiv.appendChild(link);
   }
-  
+
   li.appendChild(imageDiv);
   li.appendChild(bodyDiv);
-  
+
   return li;
 }
 
@@ -56,7 +56,7 @@ function readBlockConfig(block) {
     if (cells.length === 2) {
       const key = cells[0].textContent.trim().toLowerCase();
       const value = cells[1].textContent.trim();
-      
+
       if (key === 'limit') {
         config.limit = parseInt(value, 10);
       } else if (key === 'featured') {
@@ -75,13 +75,13 @@ function readBlockConfig(block) {
 export default async function decorate(block) {
   // Read configuration from block
   const config = readBlockConfig(block);
-  
+
   // Get already displayed article paths to avoid duplication
   const excludePaths = getDisplayedArticlePaths(block);
   if (excludePaths.length > 0) {
     config.excludePaths = excludePaths;
   }
-  
+
   // Clear the block
   block.innerHTML = '';
 
@@ -95,12 +95,11 @@ export default async function decorate(block) {
 
   // Create the cards list
   const ul = document.createElement('ul');
-  
+
   articles.forEach((article) => {
     const card = createArticleCard(article);
     ul.appendChild(card);
   });
-  
+
   block.appendChild(ul);
 }
-

@@ -29,23 +29,19 @@ export async function fetchNewsArticles(filterOptions = {}) {
     }
 
     if (filterOptions.tag) {
-      articles = articles.filter((article) => 
-        article.tags && article.tags.includes(filterOptions.tag)
+      articles = articles.filter(
+        (article) => article.tags && article.tags.includes(filterOptions.tag),
       );
     }
 
     // Exclude specific article paths (for deduplication)
     if (filterOptions.excludePaths && filterOptions.excludePaths.length > 0) {
-      articles = articles.filter((article) => 
-        !filterOptions.excludePaths.includes(article.path)
-      );
+      articles = articles.filter((article) => !filterOptions.excludePaths.includes(article.path));
     }
 
     // Apply sorting
     if (filterOptions.sortBy === 'releaseDate') {
-      articles = articles.sort((a, b) => 
-        parseInt(b.releaseDate, 10) - parseInt(a.releaseDate, 10)
-      );
+      articles = articles.sort((a, b) => parseInt(b.releaseDate, 10) - parseInt(a.releaseDate, 10));
     }
 
     // Apply limit
@@ -55,6 +51,7 @@ export async function fetchNewsArticles(filterOptions = {}) {
 
     return articles;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching news articles:', error);
     return [];
   }
@@ -86,10 +83,10 @@ export function buildArticleImage(imageSrc, alt, eager = false) {
  */
 export function formatArticleDate(releaseDate) {
   const date = new Date(parseInt(releaseDate, 10));
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 }
 
@@ -101,7 +98,7 @@ export function formatArticleDate(releaseDate) {
  */
 export function getDisplayedArticlePaths(currentBlock) {
   const displayedPaths = [];
-  
+
   // Check for dynamic-hero blocks
   const heroBlocks = document.querySelectorAll('.dynamic-hero');
   heroBlocks.forEach((hero) => {
@@ -111,21 +108,20 @@ export function getDisplayedArticlePaths(currentBlock) {
       displayedPaths.push(link.getAttribute('href'));
     }
   });
-  
+
   // Check for other dynamic blocks that have been rendered (excluding current block)
   const dynamicBlocks = document.querySelectorAll('.dynamic-carousel, .dynamic-cards');
   dynamicBlocks.forEach((block) => {
     // Skip the current block being decorated
     if (block === currentBlock) return;
-    
+
     // Get all article links
     const links = block.querySelectorAll('a[href*="/news/"]');
     links.forEach((link) => {
       displayedPaths.push(link.getAttribute('href'));
     });
   });
-  
+
   // Remove duplicates
   return [...new Set(displayedPaths)];
 }
-

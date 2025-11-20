@@ -145,6 +145,7 @@
   margin-top: 24px;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 .dynamic-carousel .carousel-slide-indicator button {
   width: 12px;
   height: 12px;

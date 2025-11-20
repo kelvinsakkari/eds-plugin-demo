@@ -86,17 +86,17 @@ function createArticleSlide(article, slideIndex, carouselId) {
 
   const contentDiv = document.createElement('div');
   contentDiv.classList.add('carousel-slide-content');
-  
+
   const title = document.createElement('h3');
   title.textContent = article.title;
   title.setAttribute('id', `carousel-${carouselId}-slide-${slideIndex}-title`);
-  
+
   const description = document.createElement('p');
   description.textContent = article.description;
 
   const buttonContainer = document.createElement('p');
   buttonContainer.classList.add('button-container');
-  
+
   if (article.path) {
     const link = document.createElement('a');
     link.href = article.path;
@@ -140,7 +140,7 @@ function readBlockConfig(block) {
     if (cells.length === 2) {
       const key = cells[0].textContent.trim().toLowerCase();
       const value = cells[1].textContent.trim();
-      
+
       if (key === 'limit') {
         config.limit = parseInt(value, 10);
       } else if (key === 'featured') {
@@ -162,13 +162,13 @@ export default async function decorate(block) {
 
   // Read configuration from block
   const config = readBlockConfig(block);
-  
+
   // Get already displayed article paths to avoid duplication
   const excludePaths = getDisplayedArticlePaths(block);
   if (excludePaths.length > 0) {
     config.excludePaths = excludePaths;
   }
-  
+
   // Clear the block
   block.innerHTML = '';
 
@@ -231,4 +231,3 @@ export default async function decorate(block) {
     bindEvents(block);
   }
 }
-
