@@ -1,21 +1,20 @@
-.dynamic-carousel {
-  position: relative;
-}
-
 .dynamic-carousel .carousel-slides-container {
   position: relative;
+  padding: 0 60px;
 }
 
-.dynamic-carousel .carousel-slides {
-  overflow: scroll;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  display: flex;
-  gap: 16px;
+.dynamic-carousel .carousel-slides,
+.dynamic-carousel .carousel-slide-indicators {
   list-style: none;
   margin: 0;
   padding: 0;
-  scrollbar-width: none;
+}
+
+.dynamic-carousel .carousel-slides {
+  display: flex;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  overflow: scroll clip;
 }
 
 .dynamic-carousel .carousel-slides::-webkit-scrollbar {
@@ -85,68 +84,76 @@
   opacity: 0.9;
 }
 
+/* Navigation buttons - matching original carousel */
 .dynamic-carousel .carousel-navigation-buttons {
   position: absolute;
   top: 50%;
+  transform: translateY(-50%);
   left: 0;
   right: 0;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.dynamic-carousel .carousel-navigation-buttons button {
-  pointer-events: auto;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background-color: var(--background-color);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
+  justify-content: space-between;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.dynamic-carousel .carousel-navigation-buttons button:hover {
-  transform: scale(1.1);
+/* stylelint-disable-next-line no-descending-specificity */
+.dynamic-carousel .carousel-navigation-buttons button {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 50%;
+  padding: 0;
+  border: none;
+  background-color: rgb(19 19 19 / 25%);
+  transition: background-color 0.2s;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
-.dynamic-carousel .slide-prev::before {
-  content: '‹';
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--text-color);
+.dynamic-carousel .carousel-navigation-buttons button:hover,
+.dynamic-carousel .carousel-navigation-buttons button:focus-visible {
+  background-color: rgb(19 19 19 / 75%);
 }
 
-.dynamic-carousel .slide-next::before {
-  content: '›';
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--text-color);
+.dynamic-carousel .carousel-navigation-buttons button::after {
+  display: block;
+  content: '';
+  border: 2px solid white;
+  border-bottom: 0;
+  border-left: 0;
+  height: 12px;
+  width: 12px;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 2px);
+  transform: translate(-50%, -50%) rotate(-135deg);
 }
 
+.dynamic-carousel .carousel-navigation-buttons button.slide-next::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+  left: calc(50% - 2px);
+}
+
+/* Slide indicators - smaller version */
 .dynamic-carousel .carousel-slide-indicators {
   display: flex;
   justify-content: center;
   gap: 8px;
-  list-style: none;
-  margin: 24px 0 0;
-  padding: 0;
+  margin-top: 24px;
 }
 
 .dynamic-carousel .carousel-slide-indicator button {
   width: 12px;
   height: 12px;
+  margin: 0;
+  padding: 0;
   border: 2px solid var(--accent-color);
   border-radius: 50%;
   background-color: transparent;
   cursor: pointer;
-  padding: 0;
   transition: background-color 0.2s ease;
 }
 
@@ -158,6 +165,13 @@
 .dynamic-carousel .carousel-slide-indicator button[disabled] {
   background-color: var(--accent-color);
   cursor: default;
+}
+
+/* Responsive layout */
+@media (width >= 600px) {
+  .dynamic-carousel .carousel-slides-container {
+    padding: 0 70px;
+  }
 }
 
 @media (width >= 768px) {
@@ -183,16 +197,3 @@
     font-size: 18px;
   }
 }
-
-@media (width >= 900px) {
-  .dynamic-carousel .carousel-navigation-buttons button {
-    width: 48px;
-    height: 48px;
-  }
-
-  .dynamic-carousel .slide-prev::before,
-  .dynamic-carousel .slide-next::before {
-    font-size: 32px;
-  }
-}
-
