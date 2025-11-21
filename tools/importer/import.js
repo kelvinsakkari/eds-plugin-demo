@@ -92,8 +92,8 @@ const createMetadataBlock = (main, document, url) => {
   // set the category
   meta.Category = 'news';
 
-  // set featured (blank by default, can be set to 'true' later)
-  meta.Featured = '';
+  // set feature (blank by default, can be set to 'true' later)
+  meta.Feature = '';
 
   meta.template = 'article';
 
