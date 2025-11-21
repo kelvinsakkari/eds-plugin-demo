@@ -16,15 +16,24 @@ const extractCfBody = (main, document) => {
   const contentfragment = document.querySelector('div.contentfragment');
   if (!contentfragment) return;
   const img = document.querySelector('.cf-feature-image');
-  const cfBody = document.querySelector('.cmp-contentfragment__element--body .cmp-contentfragment__element-value').innerHTML.trim();
-  console.log('cfBody:', cfBody);
-  if (cfBody) {
-    contentfragment.innerHTML = cfBody;
-    contentfragment.prepend(img);
+  const cfBodyElement = document.querySelector('.cmp-contentfragment__element--body .cmp-contentfragment__element-value');
+  if (cfBodyElement) {
+    const cfBody = cfBodyElement.innerHTML.trim();
+    console.log('cfBody:', cfBody);
+    if (cfBody) {
+      // Create a new div to hold the clean content
+      const cleanContent = document.createElement('div');
+      cleanContent.innerHTML = cfBody;
+      if (img) {
+        cleanContent.prepend(img);
+      }
+      // Replace the entire contentfragment with the clean content
+      contentfragment.replaceWith(cleanContent);
+    }
   }
 };
 
-const createMetadataBlock = (main, document) => {
+const createMetadataBlock = (main, document, url) => {
   const meta = {};
 
   // find the <title> element
@@ -66,8 +75,25 @@ const createMetadataBlock = (main, document) => {
   // set the tags
   const tags = document.querySelectorAll('.cmp-contentfragment__element--topics .cmp-contentfragment__element-value ul.cf-topics li');
   if (tags.length > 0) {
-    meta.Tags = Array.from(tags).map((tag) => tag.textContent.trim()).join(', ');
+    meta.Tags = Array.from(tags)
+      .map((tag) => tag.textContent.trim().toLowerCase().replace(/\s+/g, '-'))
+      .join(', ');
   }
+
+  // extract branch from URL path (../content/{branch}/...)
+  if (url) {
+    const urlPath = new URL(url).pathname;
+    const pathMatch = urlPath.match(/\/content\/([^/]+)\//);
+    if (pathMatch && pathMatch[1]) {
+      meta.Branch = pathMatch[1];
+    }
+  }
+
+  // set the category
+  meta.Category = 'news';
+
+  // set featured (blank by default, can be set to 'true' later)
+  meta.Featured = '';
 
   meta.template = 'article';
 
@@ -97,13 +123,34 @@ export default {
   }) => {
     // define the main element: the one that will be transformed to Markdown
     const main = document.body;
-    createMetadataBlock(main, document);
+    createMetadataBlock(main, document, url);
     extractCfBody(main, document);
     // attempt to remove non-content elements
     WebImporter.DOMUtils.remove(main, [
-     
-      
-      
+      'header',
+      'nav',
+      'footer',
+      '.header',
+      '.navigation',
+      '.footer',
+      'aside',
+      '.breadcrumb',
+      '.breadcrumbs',
+      '.side-nav',
+      '.sidebar',
+      '.metadata',
+      '.comments',
+      '.related-content',
+      '.share-buttons',
+      '.social-share',
+      'div.contentfragment',
+      '.cf-dateline',
+      '.cmp-contentfragment',
+      '.cmp-contentfragment__element',
+      '.cmp-contentfragment__element--releaseDate',
+      '.cmp-contentfragment__element--author',
+      '.cmp-contentfragment__element--topics',
+      '.cmp-contentfragment__element--body',
     ]);
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
