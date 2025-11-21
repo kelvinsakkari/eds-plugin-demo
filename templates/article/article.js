@@ -42,7 +42,13 @@ function decorateArticle(main) {
   const author = getMetadata('author') || 'Unknown Author';
   const publishDate = getMetadata('release-date') || '';
   byline.textContent = publishDate ? `By ${author} | ${publishDate}` : `By ${author}`;
-  image.after(byline, primary.children[3]);
+  
+  // Insert after image if it exists, otherwise after h1
+  if (image) {
+    image.after(byline, primary.children[3]);
+  } else if (h1) {
+    h1.after(byline, primary.children[3]);
+  }
 
   // Create the <aside> element
   const aside = document.createElement('aside');
