@@ -5,13 +5,31 @@
         padding: 0;
 
         li {
+            margin-bottom: 1.5rem;
+            font-size: var(--body-font-size-s);
+
             a {
-                font-weight: bold;
+                display: block;
+                text-decoration: none;
+                color: inherit;
+
+                .title {
+                    font-weight: bold;
+                    color: var(--link-color);
+                    display: block;
+                }
             }
 
-            p {
-                font-size: smaller;
+            p.description {
+                font-size: var(--body-font-size-s);
                 margin: 0;
+                color: var(--text-color);
+            }
+
+            &:hover {
+                border-left: 5px solid var(--accent-color);
+                padding-left: 10px;
+                transition: all 0.3s ease;
             }
         }
     }

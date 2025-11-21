@@ -1,6 +1,18 @@
 import { buildBlock, decorateBlock, getMetadata } from '../../scripts/aem.js';
 
 /**
+ * Converts a tag from lowercase-with-dashes to Title Case with spaces
+ * @param {string} tag - tag in format "humanitarian-missions"
+ * @returns {string} tag in format "Humanitarian Missions"
+ */
+function formatTagForDisplay(tag) {
+  return tag
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/**
  * Collects all article:tag meta values from <head>
  * @returns {string[]} array of tag values
  */
@@ -71,7 +83,7 @@ function decorateArticle(main) {
     ul.className = 'article-tags';
     tags.forEach((tag) => {
       const li = document.createElement('li');
-      li.textContent = tag;
+      li.textContent = formatTagForDisplay(tag);
       ul.appendChild(li);
     });
     tagSection.appendChild(ul);
