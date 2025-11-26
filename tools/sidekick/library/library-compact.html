@@ -61,6 +61,21 @@
         padding: 10px 12px;
         font-size: 14px;
       }
+
+      /* Reposition confirmation banner to be visible */
+      sidekick-library::part(toast),
+      sidekick-library .toast,
+      sidekick-library [role="status"],
+      sidekick-library .confirmation-banner,
+      sidekick-library .notification {
+        bottom: 60px !important; /* Move up from bottom */
+        position: fixed !important;
+      }
+
+      /* If banner uses transform, adjust it */
+      sidekick-library::part(toast) {
+        transform: translateY(-60px) !important;
+      }
     </style>
     <title>Sidekick Library</title>
   </head>
