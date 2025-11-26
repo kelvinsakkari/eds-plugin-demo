@@ -8,19 +8,20 @@ helix-importer-ui
 *.bak
 .idea
 
-# USWDS compiled output
+# USWDS compiled output (not used - for reference only)
 styles/uswds-compiled.css
 styles/uswds-compiled.css.map
 styles/uswds-utilities.css
 styles/uswds-utilities.css.map
-styles/uswds-buttons.css
-styles/uswds-buttons.css.map
 
-# USWDS modular block compiled CSS
-blocks/card/card.css
-blocks/card/card.css.map
-blocks/grid/grid.css
-blocks/grid/grid.css.map
+# USWDS buttons and blocks CSS are PRE-COMPILED and COMMITTED
+# (EDS doesn't compile SCSS, so these must be in the repo)
+# styles/uswds-buttons.css ← COMMITTED
+# blocks/card/card.css ← COMMITTED  
+# blocks/grid/grid.css ← COMMITTED
+
+# Source maps can be ignored
+*.css.map
 
 .sass-cache/
 SIDEKICK-LIBRARY-CROSS-SITE-SETUP.md
