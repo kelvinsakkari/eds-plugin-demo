@@ -1,0 +1,356 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>DVIDS Article Import</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; background: transparent; height: 100vh; overflow: hidden; }
+    .wrap { padding: 12px; background: var(--sk-bg, rgba(32,32,32,0.95)); color: #fff; height: 100vh; display: flex; flex-direction: column; }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    input[type="text"] { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #666; background: #1a1a1a; color: #fff; }
+    input[type="text"]::placeholder { color: #888; }
+    select, button { padding: 8px; border-radius: 6px; border: 1px solid #666; background: #222; color: #fff; cursor: pointer; }
+    button:hover { background: #333; }
+    
+    /* Article list (vertical layout for articles) */
+    .article-list { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      flex: 1;
+      overflow-y: auto; 
+      min-height: 0;
+    }
+    
+    .article-card { 
+      display: flex;
+      gap: 12px;
+      background: #1a1a1a; 
+      border-radius: 8px; 
+      overflow: hidden; 
+      cursor: pointer; 
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .article-card:hover { 
+      border-color: #0066cc; 
+      background: #222;
+    }
+    .article-card.selected {
+      border-color: #00cc66;
+      background: #1a2a1a;
+    }
+    
+    .article-card .thumb {
+      width: 100px;
+      min-width: 100px;
+      height: 70px;
+      object-fit: cover;
+      background: #333;
+    }
+    
+    .article-card .info {
+      flex: 1;
+      padding: 8px 12px 8px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .article-card .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 4px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .article-card .meta {
+      font-size: 11px;
+      color: #888;
+      margin: 0;
+    }
+    
+    .status { margin-top: 10px; font-size: 11px; opacity: 0.85; flex-shrink: 0; }
+    
+    /* Success overlay */
+    .copied-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,100,0,0.8);
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      border-radius: 6px;
+    }
+
+    /* Preview Dialog */
+    .preview-dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .preview-dialog {
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      max-width: 95%;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #444;
+      animation: slideUp 0.2s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .preview-dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #333;
+      background: #222;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .preview-dialog-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .preview-dialog-close {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .preview-dialog-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .preview-dialog-body {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .preview-section {
+      margin-bottom: 16px;
+    }
+    
+    .preview-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+    }
+    
+    .preview-meta {
+      font-size: 13px;
+      color: #aaa;
+    }
+    
+    .preview-image {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    
+    .preview-body {
+      font-size: 13px;
+      color: #ccc;
+      line-height: 1.5;
+      max-height: 150px;
+      overflow-y: auto;
+      background: #111;
+      padding: 12px;
+      border-radius: 6px;
+    }
+    
+    .preview-metadata {
+      font-size: 12px;
+      background: #111;
+      padding: 12px;
+      border-radius: 6px;
+    }
+    
+    .preview-metadata table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .preview-metadata td {
+      padding: 4px 8px;
+      border-bottom: 1px solid #333;
+    }
+    
+    .preview-metadata td:first-child {
+      color: #888;
+      width: 120px;
+    }
+    
+    .preview-dialog-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 16px 20px;
+      border-top: 1px solid #333;
+      background: #222;
+      border-radius: 0 0 8px 8px;
+    }
+    
+    .preview-dialog-footer button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .btn-cancel {
+      background: #333;
+      color: #fff;
+    }
+    
+    .btn-cancel:hover {
+      background: #444;
+    }
+    
+    .btn-copy {
+      background: #0066cc;
+      color: #fff;
+    }
+    
+    .btn-copy:hover {
+      background: #0052a3;
+    }
+    
+    .btn-copy:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Instructions */
+    .instructions {
+      background: #0a2a4a;
+      border: 1px solid #0066cc;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      color: #88ccff;
+      flex-shrink: 0;
+    }
+    .instructions strong {
+      color: #fff;
+    }
+    
+    /* Compact row layout for palette */
+    .row { flex-wrap: wrap; }
+    .row select { font-size: 12px; padding: 6px; }
+    .row button { font-size: 12px; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="instructions">
+      <strong>Import DVIDS Articles:</strong> Search for articles, click to preview, then copy to clipboard. Paste directly into a blank Word document.
+    </div>
+    
+    <div class="row">
+      <input id="q" type="text" placeholder="Search DVIDS articles (e.g., training, exercise, deployment)" />
+      <button id="search">Search</button>
+    </div>
+    
+    <div class="row">
+      <select id="branch">
+        <option value="">Branch: Any</option>
+        <option>Army</option>
+        <option>Navy</option>
+        <option>Air Force</option>
+        <option>Marines</option>
+        <option>Coast Guard</option>
+        <option>Space Force</option>
+        <option>National Guard</option>
+        <option>Joint</option>
+      </select>
+      <select id="sort">
+        <option value="date">Sort by: Date</option>
+        <option value="publishdate">Published</option>
+        <option value="timestamp">Updated</option>
+        <option value="score">Relevance</option>
+      </select>
+      <select id="sortdir">
+        <option value="desc">Newest</option>
+        <option value="asc">Oldest</option>
+      </select>
+      <button id="prev">◀ Prev</button>
+      <button id="next">Next ▶</button>
+    </div>
+    
+    <div id="articles" class="article-list"></div>
+    <div id="status" class="status">Enter a search term to find DVIDS articles</div>
+  </div>
+  <script src="./dvids-articles-popover.js" type="module"></script>
+</body>
+</html>
+

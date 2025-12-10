@@ -5,8 +5,17 @@
       "id": "dvids-search",
       "title": "DVIDS Images",
       "url": "/tools/sidekick/dvids/dvids-popover.html",
-      "isPopover": true,
-      "popoverRect": "width:640px;height:520px;",
+      "isPalette": true,
+      "paletteRect": "right: 0; top: 0; bottom: 0; width: 380px;",
+      "environments": ["edit"],
+      "pinned": true
+    },
+    {
+      "id": "dvids-articles",
+      "title": "DVIDS Articles",
+      "url": "/tools/sidekick/dvids/dvids-articles-popover.html",
+      "isPalette": true,
+      "paletteRect": "right: 0; top: 0; bottom: 0; width: 420px;",
       "environments": ["edit"],
       "pinned": true
     },
