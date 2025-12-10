@@ -156,8 +156,9 @@ function renderArticleList(items) {
     }
     
     const title = document.createElement('p');
-    title.className = 'title';
+    title.className = 'article-title';
     title.textContent = titleText;
+    console.log('[TITLE ELEMENT]', title.outerHTML); // Debug: see the actual HTML
     
     const meta = document.createElement('p');
     meta.className = 'meta';
@@ -412,6 +413,15 @@ function generateArticleHtml(article, imageData = null) {
   // Build the full article HTML structure for Word
   // Word needs explicit table borders and styling to render tables properly
   
+  // Build the image for metadata table (smaller version)
+  let metaImageHtml = '';
+  if (imageData && imageData.dataUrl) {
+    // Use the same base64 image but smaller for metadata
+    metaImageHtml = `<img src="${imageData.dataUrl}" alt="" width="200">`;
+  } else if (article.image) {
+    metaImageHtml = `<img src="${article.image}" alt="" width="200">`;
+  }
+  
   const html = `<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
 <head>
@@ -424,6 +434,8 @@ function generateArticleHtml(article, imageData = null) {
 </style>
 </head>
 <body>
+<h1>${escapeHtml(extractStringValue(article.title))}</h1>
+
 ${heroImageHtml}
 
 ${bodyHtml}
@@ -446,7 +458,7 @@ ${bodyHtml}
 </tr>
 <tr>
 <td width="150" style="border:1px solid black;"><strong>Image</strong></td>
-<td style="border:1px solid black;">${article.image || ''}</td>
+<td style="border:1px solid black;">${metaImageHtml}</td>
 </tr>
 <tr>
 <td width="150" style="border:1px solid black;"><strong>Release Date</strong></td>
