@@ -212,8 +212,8 @@ function showPreviewDialog(article) {
           <div class="preview-meta">
             <strong>Date:</strong> ${formatDate(article.date)}<br>
             <strong>Branch:</strong> ${article.branch || 'N/A'}<br>
-            <strong>Author:</strong> ${article.credit || 'N/A'}<br>
-            <strong>Unit:</strong> ${article.unit_name || 'N/A'}
+            <strong>Author:</strong> ${extractStringValue(article.credit) || 'N/A'}<br>
+            <strong>Unit:</strong> ${extractStringValue(article.unit_name) || 'N/A'}
           </div>
         </div>
         
@@ -300,6 +300,31 @@ function formatKeywords(keywords) {
 }
 
 /**
+ * Safely extract a string value from a field that might be an object
+ * DVIDS API sometimes returns objects with 'name', 'value', or other properties
+ */
+function extractStringValue(field) {
+  if (!field) return '';
+  if (typeof field === 'string') return field;
+  if (typeof field === 'object') {
+    // Try common property names
+    if (field.name) return field.name;
+    if (field.value) return field.value;
+    if (field.title) return field.title;
+    if (field.text) return field.text;
+    // If it has a toString that's not the default, use it
+    const str = String(field);
+    if (str !== '[object Object]') return str;
+    // Last resort: get first string value
+    const values = Object.values(field);
+    const firstString = values.find(v => typeof v === 'string');
+    if (firstString) return firstString;
+    return '';
+  }
+  return String(field);
+}
+
+/**
  * Generate the HTML content for clipboard (Word-compatible)
  * Uses explicit table styling that Word/SharePoint recognize
  * @param {Object} article - Article data from DVIDS
@@ -342,54 +367,54 @@ ${bodyHtml}
 
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;width:100%;table-layout:fixed;">
 <colgroup>
-<col style="width:150px;">
+<col style="width:200px;">
 <col style="width:auto;">
 </colgroup>
 <tr>
 <td colspan="2" class="meta-header" style="background-color:#f0f0f0;border:1px solid black;"><strong>Metadata</strong></td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Title</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Title</td>
 <td style="border:1px solid black;">${escapeHtml(article.title || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Description</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Description</td>
 <td style="border:1px solid black;">${escapeHtml(article.description || article.short_description || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Image</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Image</td>
 <td style="border:1px solid black;">${article.image || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Release Date</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Release Date</td>
 <td style="border:1px solid black;">${formatDateForMeta(article.date)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Dateline</td>
-<td style="border:1px solid black;">${escapeHtml(article.location || '')}</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Dateline</td>
+<td style="border:1px solid black;">${escapeHtml(extractStringValue(article.location))}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Author</td>
-<td style="border:1px solid black;">${escapeHtml(article.credit || '')}</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Author</td>
+<td style="border:1px solid black;">${escapeHtml(extractStringValue(article.credit))}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Tags</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Tags</td>
 <td style="border:1px solid black;">${formatKeywords(article.keywords)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Branch</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Branch</td>
 <td style="border:1px solid black;">${article.branch || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Category</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Category</td>
 <td style="border:1px solid black;">news</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">Feature</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">Feature</td>
 <td style="border:1px solid black;"></td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:150px;white-space:nowrap;">template</td>
+<td style="border:1px solid black;width:200px;white-space:nowrap;">template</td>
 <td style="border:1px solid black;">article</td>
 </tr>
 </table>
@@ -402,25 +427,74 @@ ${bodyHtml}
 
 /**
  * Convert an image URL to base64 data URL
+ * Tries multiple approaches to handle CORS issues
  */
 async function imageToBase64(imageUrl) {
-  if (!imageUrl) return null;
+  if (!imageUrl) {
+    console.log('[IMAGE] No image URL provided');
+    return null;
+  }
   
+  console.log('[IMAGE] Attempting to fetch:', imageUrl);
+  
+  // Try fetching as blob first (works better with some CORS configs)
   try {
-    console.log('[IMAGE] Fetching:', imageUrl);
-    
+    const response = await fetch(imageUrl, { mode: 'cors' });
+    if (response.ok) {
+      const blob = await response.blob();
+      console.log('[IMAGE] Fetched as blob, size:', Math.round(blob.size / 1024), 'KB');
+      
+      // Convert blob to data URL
+      const dataUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+      
+      // Get dimensions by loading the data URL
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((resolve) => { img.onload = resolve; });
+      
+      let width = img.naturalWidth;
+      let height = img.naturalHeight;
+      const maxWidth = 800;
+      
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+        
+        // Resize using canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        console.log('[IMAGE] Resized to:', width, 'x', height);
+        return { dataUrl: resizedDataUrl, width, height };
+      }
+      
+      console.log('[IMAGE] Using original size:', width, 'x', height);
+      return { dataUrl, width, height };
+    }
+  } catch (err) {
+    console.log('[IMAGE] Fetch as blob failed:', err.message, '- trying Image approach');
+  }
+  
+  // Fallback: Try loading as Image with crossOrigin
+  try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = imageUrl;
     
     await new Promise((resolve, reject) => {
       img.onload = resolve;
-      img.onerror = reject;
+      img.onerror = (e) => reject(new Error('Image load failed'));
     });
     
-    console.log('[IMAGE] Loaded:', img.naturalWidth, 'x', img.naturalHeight);
+    console.log('[IMAGE] Loaded via Image element:', img.naturalWidth, 'x', img.naturalHeight);
     
-    // Scale down if too large (max 800px wide for Word)
     let width = img.naturalWidth;
     let height = img.naturalHeight;
     const maxWidth = 800;
@@ -441,7 +515,8 @@ async function imageToBase64(imageUrl) {
     
     return { dataUrl, width, height };
   } catch (err) {
-    console.error('[IMAGE] Failed to convert:', err);
+    console.error('[IMAGE] All methods failed:', err.message);
+    console.log('[IMAGE] Will proceed without embedded image');
     return null;
   }
 }
