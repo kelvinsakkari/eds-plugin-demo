@@ -184,6 +184,19 @@ async function onSelectArticle(item, card) {
     const article = data.results;
     if (!article) throw new Error('No article data returned');
     
+    // Debug: log full article structure
+    console.log('[ARTICLE FULL DATA]', JSON.stringify(article, null, 2));
+    console.log('[ARTICLE KEY FIELDS]', {
+      title: article.title,
+      titleType: typeof article.title,
+      credit: article.credit,
+      creditType: typeof article.credit,
+      image: article.image,
+      thumbnail: article.thumbnail,
+      location: article.location,
+      locationType: typeof article.location,
+    });
+    
     showPreviewDialog(article);
     setStatus('Article loaded - review and copy to clipboard');
   } catch (err) {
@@ -242,10 +255,10 @@ function showPreviewDialog(article) {
           <div class="preview-section-label">Metadata Block (will be added)</div>
           <div class="preview-metadata">
             <table>
-              <tr><td>Title</td><td>${escapeHtml(article.title || '')}</td></tr>
-              <tr><td>Description</td><td>${escapeHtml((article.description || article.short_description || '').substring(0, 100))}...</td></tr>
+              <tr><td>Title</td><td>${escapeHtml(extractStringValue(article.title))}</td></tr>
+              <tr><td>Description</td><td>${escapeHtml((extractStringValue(article.description) || extractStringValue(article.short_description) || '').substring(0, 100))}...</td></tr>
               <tr><td>Release Date</td><td>${formatDateForMeta(article.date)}</td></tr>
-              <tr><td>Author</td><td>${escapeHtml(article.credit || '')}</td></tr>
+              <tr><td>Author</td><td>${escapeHtml(extractStringValue(article.credit))}</td></tr>
               <tr><td>Branch</td><td>${article.branch || ''}</td></tr>
               <tr><td>Category</td><td>news</td></tr>
               <tr><td>Template</td><td>article</td></tr>
@@ -374,56 +387,52 @@ ${bodyHtml}
 <hr>
 <p>&nbsp;</p>
 
-<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;width:100%;table-layout:fixed;">
-<colgroup>
-<col style="width:200px;">
-<col style="width:auto;">
-</colgroup>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;">
 <tr>
-<td colspan="2" class="meta-header" style="background-color:#f0f0f0;border:1px solid black;"><strong>Metadata</strong></td>
+<td colspan="2" style="background-color:#f0f0f0;border:1px solid black;"><strong>Metadata</strong></td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Title</td>
-<td style="border:1px solid black;">${escapeHtml(article.title || '')}</td>
+<td width="150" style="border:1px solid black;"><strong>Title</strong></td>
+<td style="border:1px solid black;">${escapeHtml(extractStringValue(article.title))}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Description</td>
-<td style="border:1px solid black;">${escapeHtml(article.description || article.short_description || '')}</td>
+<td width="150" style="border:1px solid black;"><strong>Description</strong></td>
+<td style="border:1px solid black;">${escapeHtml(extractStringValue(article.description) || extractStringValue(article.short_description) || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Image</td>
+<td width="150" style="border:1px solid black;"><strong>Image</strong></td>
 <td style="border:1px solid black;">${article.image || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Release Date</td>
+<td width="150" style="border:1px solid black;"><strong>Release Date</strong></td>
 <td style="border:1px solid black;">${formatDateForMeta(article.date)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Dateline</td>
+<td width="150" style="border:1px solid black;"><strong>Dateline</strong></td>
 <td style="border:1px solid black;">${escapeHtml(extractStringValue(article.location))}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Author</td>
+<td width="150" style="border:1px solid black;"><strong>Author</strong></td>
 <td style="border:1px solid black;">${escapeHtml(extractStringValue(article.credit))}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Tags</td>
+<td width="150" style="border:1px solid black;"><strong>Tags</strong></td>
 <td style="border:1px solid black;">${formatKeywords(article.keywords)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Branch</td>
+<td width="150" style="border:1px solid black;"><strong>Branch</strong></td>
 <td style="border:1px solid black;">${article.branch || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Category</td>
+<td width="150" style="border:1px solid black;"><strong>Category</strong></td>
 <td style="border:1px solid black;">news</td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">Feature</td>
+<td width="150" style="border:1px solid black;"><strong>Feature</strong></td>
 <td style="border:1px solid black;"></td>
 </tr>
 <tr>
-<td style="border:1px solid black;width:200px;white-space:nowrap;">template</td>
+<td width="150" style="border:1px solid black;"><strong>template</strong></td>
 <td style="border:1px solid black;">article</td>
 </tr>
 </table>
