@@ -330,52 +330,56 @@ ${bodyHtml}
 <hr>
 <p>&nbsp;</p>
 
-<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;">
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;border:1px solid black;width:100%;table-layout:fixed;">
+<colgroup>
+<col style="width:150px;">
+<col style="width:auto;">
+</colgroup>
 <tr>
-<td colspan="2" class="meta-header" style="background-color:#f0f0f0;"><strong>Metadata</strong></td>
+<td colspan="2" class="meta-header" style="background-color:#f0f0f0;border:1px solid black;"><strong>Metadata</strong></td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Title</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Title</td>
 <td style="border:1px solid black;">${escapeHtml(article.title || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Description</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Description</td>
 <td style="border:1px solid black;">${escapeHtml(article.description || article.short_description || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Image</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Image</td>
 <td style="border:1px solid black;">${article.image || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Release Date</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Release Date</td>
 <td style="border:1px solid black;">${formatDateForMeta(article.date)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Dateline</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Dateline</td>
 <td style="border:1px solid black;">${escapeHtml(article.location || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Author</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Author</td>
 <td style="border:1px solid black;">${escapeHtml(article.credit || '')}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Tags</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Tags</td>
 <td style="border:1px solid black;">${formatKeywords(article.keywords)}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Branch</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Branch</td>
 <td style="border:1px solid black;">${article.branch || ''}</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Category</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Category</td>
 <td style="border:1px solid black;">news</td>
 </tr>
 <tr>
-<td style="border:1px solid black;">Feature</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">Feature</td>
 <td style="border:1px solid black;"></td>
 </tr>
 <tr>
-<td style="border:1px solid black;">template</td>
+<td style="border:1px solid black;width:150px;white-space:nowrap;">template</td>
 <td style="border:1px solid black;">article</td>
 </tr>
 </table>
