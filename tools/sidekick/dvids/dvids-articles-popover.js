@@ -182,7 +182,17 @@ function renderArticleList(items) {
  */
 async function onSelectArticle(item, card) {
   console.log('[SELECT]', item.id, item.title);
-  console.log('[SEARCH ITEM]', item); // Log search result to see thumbnail
+  console.log('[SEARCH ITEM]', item); // Log search result to see all fields
+  
+  // Check for image-related fields in search result
+  console.log('[SEARCH ITEM IMAGE FIELDS]', {
+    thumbnail: item.thumbnail,
+    image: item.image,
+    image_id: item.image_id,
+    photo_id: item.photo_id,
+    featured_image: item.featured_image,
+    asset_id: item.asset_id,
+  });
   
   // Visual feedback
   document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
@@ -200,9 +210,31 @@ async function onSelectArticle(item, card) {
     const article = data.results;
     if (!article) throw new Error('No article data returned');
     
-    // Use thumbnail from search result since asset API doesn't return images for news
-    // The search result 'item' has the thumbnail
-    if (!article.image && item.thumbnail) {
+    // Try to get full-resolution image if we have an image asset ID
+    let fullImageUrl = null;
+    const imageId = item.image_id || item.photo_id || article.image_id || article.photo_id;
+    
+    if (imageId) {
+      // Fetch the full image from asset API (like dvids-popover.js does)
+      console.log('[IMAGE] Fetching full image asset:', imageId);
+      try {
+        const imageAssetUrl = `${API_BASE_ASSET}?id=${encodeURIComponent(imageId)}&api_key=${API_KEY}`;
+        const imgRes = await fetch(imageAssetUrl, { headers: { Accept: 'application/json' } });
+        if (imgRes.ok) {
+          const imgData = await imgRes.json();
+          fullImageUrl = imgData.results?.image;
+          console.log('[IMAGE] Got full image URL:', fullImageUrl);
+        }
+      } catch (imgErr) {
+        console.log('[IMAGE] Failed to fetch full image:', imgErr.message);
+      }
+    }
+    
+    // Use full image URL, or fall back to thumbnail from search result
+    if (fullImageUrl) {
+      article.image = fullImageUrl;
+      console.log('[IMAGE] Using full-resolution image');
+    } else if (!article.image && item.thumbnail) {
       article.image = item.thumbnail;
       console.log('[IMAGE] Using thumbnail from search result:', item.thumbnail);
     }
@@ -393,6 +425,38 @@ function formatLocation(location) {
 }
 
 /**
+ * Remove dateline from the beginning of article body
+ * DVIDS articles often start with "CITY, STATE — " which duplicates the dateline metadata
+ * @param {string} body - Article body HTML
+ * @returns {string} Body with dateline removed
+ */
+function stripDatelineFromBody(body) {
+  if (!body) return '';
+  
+  // Common dateline patterns:
+  // "FORT BRAGG, N.C. — Content..."
+  // "WASHINGTON — Content..."
+  // "GRAFENWOEHR, Germany — Content..."
+  // Can be at start of body or inside first <p> tag
+  
+  // Pattern: Start of string or after opening p tag, then ALLCAPS location, then em-dash or double-dash
+  // Em-dash: — (HTML entity or character)
+  // Also handle regular dashes: -- or –
+  
+  const datelinePattern = /^(\s*<p[^>]*>)?\s*[A-Z][A-Z\s,.\-']+\s*[—–\-]{1,2}\s*/i;
+  
+  let cleaned = body;
+  
+  // Check if body starts with a dateline pattern
+  if (datelinePattern.test(cleaned)) {
+    cleaned = cleaned.replace(datelinePattern, '$1');
+    console.log('[DATELINE] Stripped dateline from body');
+  }
+  
+  return cleaned;
+}
+
+/**
  * Generate the HTML content for clipboard (Word-compatible)
  * Uses explicit table styling that Word/SharePoint recognize
  * @param {Object} article - Article data from DVIDS
@@ -400,7 +464,8 @@ function formatLocation(location) {
  */
 function generateArticleHtml(article, imageData = null) {
   // Clean up body content - DVIDS returns HTML
-  let bodyHtml = article.body || '';
+  // Remove dateline from body since it's added via metadata
+  let bodyHtml = stripDatelineFromBody(article.body || '');
   
   // Build hero image HTML with embedded base64 or fallback to URL
   let heroImageHtml = '';
