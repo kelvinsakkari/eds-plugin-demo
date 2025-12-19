@@ -1,0 +1,229 @@
+/* stylelint-disable selector-class-pattern */
+
+/*
+ * USWDS Alert Block Styles
+ * Based on https://designsystem.digital.gov/components/alert/
+ */
+
+.alert {
+  font-family: var(--body-font-family);
+}
+
+.alert-container,
+.alert-wrapper {
+  max-width: 100%;
+  padding: 0;
+}
+
+/* Base Alert Styles */
+.usa-alert {
+  background-color: #f0f0f0;
+  border-left: 0.5rem solid;
+  padding: 1rem;
+  position: relative;
+}
+
+.usa-alert__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.usa-alert__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.125rem;
+}
+
+.usa-alert__icon .usa-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.usa-alert__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.usa-alert__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.usa-alert__heading {
+  font-family: var(--heading-font-family);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.5rem;
+}
+
+/* Remove the underline style from headings inside alerts */
+.usa-alert__heading::after {
+  display: none;
+}
+
+.usa-alert__text {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.usa-alert__text p {
+  margin: 0 0 0.5rem;
+}
+
+.usa-alert__text p:last-child {
+  margin-bottom: 0;
+}
+
+.usa-alert__text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.usa-alert__text a:hover {
+  text-decoration: none;
+}
+
+/* Info Alert (default) */
+.usa-alert--info {
+  background-color: #e7f6f8;
+  border-left-color: #00bde3;
+}
+
+.usa-alert--info .usa-alert__icon svg {
+  fill: #00bde3;
+}
+
+/* Success Alert */
+.usa-alert--success {
+  background-color: #ecf3ec;
+  border-left-color: #00a91c;
+}
+
+.usa-alert--success .usa-alert__icon svg {
+  fill: #00a91c;
+}
+
+/* Warning Alert */
+.usa-alert--warning {
+  background-color: #faf3d1;
+  border-left-color: #ffbe2e;
+}
+
+.usa-alert--warning .usa-alert__icon svg {
+  fill: #ffbe2e;
+}
+
+/* Error Alert */
+.usa-alert--error {
+  background-color: #f4e3db;
+  border-left-color: #d54309;
+}
+
+.usa-alert--error .usa-alert__icon svg {
+  fill: #d54309;
+}
+
+/* Emergency Alert */
+.usa-alert--emergency {
+  background-color: #9c3d10;
+  border-left-color: #9c3d10;
+  color: #fff;
+}
+
+.usa-alert--emergency .usa-alert__icon svg {
+  fill: #fff;
+}
+
+.usa-alert--emergency .usa-alert__heading,
+.usa-alert--emergency .usa-alert__text {
+  color: #fff;
+}
+
+.usa-alert--emergency .usa-alert__text a {
+  color: #fff;
+}
+
+/* Slim Variant */
+.usa-alert--slim {
+  padding: 0.5rem 1rem;
+}
+
+.usa-alert--slim .usa-alert__body {
+  align-items: center;
+}
+
+.usa-alert--slim .usa-alert__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0;
+}
+
+.usa-alert--slim .usa-alert__icon .usa-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.usa-alert--slim .usa-alert__text {
+  font-size: 0.9375rem;
+}
+
+/* No Icon Variant */
+.usa-alert--no-icon .usa-alert__body {
+  padding-left: 0;
+}
+
+/* Responsive adjustments */
+@media (width >= 640px) {
+  .usa-alert {
+    padding: 1.5rem;
+  }
+
+  .usa-alert--slim {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .usa-alert__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .usa-alert__icon .usa-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .usa-alert--slim .usa-alert__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .usa-alert--slim .usa-alert__icon .usa-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* Section-level alert styling for full-width alerts */
+.section.alert-container {
+  margin: 0;
+  padding: 0;
+}
+
+.section.alert-container .alert-wrapper {
+  padding: 0;
+  max-width: 100%;
+}
+
+.section.alert-container .usa-alert {
+  border-radius: 0;
+}
+
