@@ -5,7 +5,8 @@
 
 const API_BASE_SEARCH = 'https://api.dvidshub.net/search';
 const API_BASE_ASSET = 'https://api.dvidshub.net/asset';
-const API_KEY = 'key-6911edd214ab0'; // consider a proxy for production
+//const API_KEY = 'key-6911edd214ab0'; // consider a proxy for production
+const API_KEY = 'key-6948ff374643b';
 const MAX_RESULTS = 15;
 
 let page = 1;
